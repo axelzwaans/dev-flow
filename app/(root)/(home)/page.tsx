@@ -2,6 +2,61 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
+import Filter from "@/components/shared/Filter";
+import { HomePageFilters } from "@/constants/filters";
+import HomeFilters from "@/components/home/HomeFilters";
+import QuestionCard from "@/components/cards/QuestionCard";
+import NoResult from "@/components/shared/NoResult";
+
+const questions = [
+  {
+    _id: "1",
+    title: "How to use React Query?",
+    tags: [
+      {
+        _id: "1",
+        name: "React",
+      },
+      {
+        _id: "2",
+        name: "React Query",
+      },
+    ],
+    author: {
+      _id: "1",
+      name: "John Doe",
+      picture: "john-doe.png",
+    },
+    upvotes: 1500000,
+    views: 500434,
+    answers: [],
+    createdAt: new Date(),
+  },
+  {
+    _id: "2",
+    title: "How to use React Query?",
+    tags: [
+      {
+        _id: "1",
+        name: "React",
+      },
+      {
+        _id: "2",
+        name: "React Query",
+      },
+    ],
+    author: {
+      _id: "1",
+      name: "John Doe",
+      picture: "john-doe.png",
+    },
+    upvotes: 10,
+    views: 20,
+    answers: [],
+    createdAt: new Date(),
+  },
+];
+
 export default function Home() {
   return (
     <>
@@ -21,6 +76,38 @@ export default function Home() {
           placeholder="Search for questions here..."
           otherClasses="flex-1"
         />
+      </div>
+      <div>
+        <Filter
+          filters={HomePageFilters}
+          otherClasses="min-h-[56px] sm:min-w-[170px] mt-8"
+          containerClasses="hidden max-md:flex"
+        />
+      </div>
+      <HomeFilters />
+      <div className="mt-10 flex w-full flex-col gap-6">
+        {questions.length > 0 ? (
+          questions.map((question) => (
+            <QuestionCard
+              key={question._id}
+              _id={question._id}
+              title={question.title}
+              tags={question.tags}
+              author={question.author}
+              upvotes={question.upvotes}
+              views={question.views}
+              answers={question.answers}
+              createdAt={question.createdAt}
+            />
+          ))
+        ) : (
+          <NoResult
+            title="There are no questions to show"
+            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+            link="/ask-question"
+            linkTitle="Ask a Question"
+          />
+        )}
       </div>
     </>
   );
