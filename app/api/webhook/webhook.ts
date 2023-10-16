@@ -11,7 +11,7 @@ type NextApiRequestWithSvixRequiredHeaders = NextApiRequest & {
   headers: IncomingHttpHeaders & WebhookRequiredHeaders;
 };
 
-const webhookSecret: any = process.env.WEBHOOK_SECRET;
+const webhookSecret: any = process.env.NEXT_CLERK_WEBHOOK_SECRET;
 
 export default async function handler(
   req: NextApiRequestWithSvixRequiredHeaders,
