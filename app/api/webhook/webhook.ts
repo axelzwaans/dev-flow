@@ -11,7 +11,7 @@ type NextApiRequestWithSvixRequiredHeaders = NextApiRequest & {
   headers: IncomingHttpHeaders & WebhookRequiredHeaders;
 };
 
-const webhookSecret: any = process.env.NEXT_CLERK_WEBHOOK_SECRET;
+const webhookSecret = process.env.NEXT_CLERK_WEBHOOK_SECRET;
 
 export default async function handler(
   req: NextApiRequestWithSvixRequiredHeaders,
@@ -20,7 +20,7 @@ export default async function handler(
   const payload = JSON.stringify(req.body);
   const headers = req.headers;
   // Create a new Webhook instance with your webhook secret
-  const wh = new Webhook(webhookSecret);
+  const wh = new Webhook(webhookSecret!);
 
   let evt: WebhookEvent;
   try {
