@@ -20,7 +20,12 @@ export default async function handler(
   const payload = JSON.stringify(req.body);
   const headers = req.headers;
   // Create a new Webhook instance with your webhook secret
-  const wh = new Webhook(webhookSecret!);
+  let wh: Webhook;
+  if (webhookSecret) {
+    wh = new Webhook(webhookSecret);
+  } else {
+    return res.status(400).json({});
+  }
 
   let evt: WebhookEvent;
   try {
