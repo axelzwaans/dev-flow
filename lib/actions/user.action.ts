@@ -1,12 +1,12 @@
 "use server";
 
+import { FilterQuery } from "mongoose";
 import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
   GetAllUsersParams,
-  GetQuestionsParams,
   GetSavedQuestionsParams,
   GetUserByIdParams,
   GetUserStatsParams,
@@ -16,7 +16,6 @@ import {
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
-import { FilterQuery } from "mongoose";
 import Answer from "@/database/answer.model";
 import { BadgeCriteriaType } from "@/types";
 import { assignBadges } from "../utils";
@@ -102,8 +101,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
   try {
     connectToDatabase();
 
-    const { searchQuery, filter, page = 1, pageSize = 20 } = params;
-
+    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
     const skipAmount = (page - 1) * pageSize;
 
     const query: FilterQuery<typeof User> = {};
@@ -127,6 +125,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
       case "top_contributors":
         sortOptions = { reputation: -1 };
         break;
+
       default:
         break;
     }
@@ -161,12 +160,14 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
     const isQuestionSaved = user.saved.includes(questionId);
 
     if (isQuestionSaved) {
+      // remove question from saved
       await User.findByIdAndUpdate(
         userId,
         { $pull: { saved: questionId } },
         { new: true }
       );
     } else {
+      // add question to saved
       await User.findByIdAndUpdate(
         userId,
         { $addToSet: { saved: questionId } },
@@ -185,7 +186,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDatabase();
 
-    const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
+    const { clerkId, searchQuery, filter, page = 1, pageSize = 20 } = params;
 
     const skipAmount = (page - 1) * pageSize;
 
@@ -211,6 +212,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       case "most_answered":
         sortOptions = { answers: -1 };
         break;
+
       default:
         break;
     }
@@ -259,7 +261,7 @@ export async function getUserInfo(params: GetUserByIdParams) {
     const totalQuestions = await Question.countDocuments({ author: user._id });
     const totalAnswers = await Answer.countDocuments({ author: user._id });
 
-    const questionUpvotes = await Question.aggregate([
+    const [questionUpvotes] = await Question.aggregate([
       { $match: { author: user._id } },
       {
         $project: {
@@ -275,7 +277,7 @@ export async function getUserInfo(params: GetUserByIdParams) {
       },
     ]);
 
-    const answerUpvotes = await Answer.aggregate([
+    const [answerUpvotes] = await Answer.aggregate([
       { $match: { author: user._id } },
       {
         $project: {
@@ -291,7 +293,7 @@ export async function getUserInfo(params: GetUserByIdParams) {
       },
     ]);
 
-    const questionViews = await Question.aggregate([
+    const [questionViews] = await Answer.aggregate([
       { $match: { author: user._id } },
       {
         $group: {
@@ -344,7 +346,7 @@ export async function getUserQuestions(params: GetUserStatsParams) {
     const totalQuestions = await Question.countDocuments({ author: userId });
 
     const userQuestions = await Question.find({ author: userId })
-      .sort({ views: -1, upvotes: -1 })
+      .sort({ createdAt: -1, views: -1, upvotes: -1 })
       .skip(skipAmount)
       .limit(pageSize)
       .populate("tags", "_id name")
@@ -370,17 +372,26 @@ export async function getUserAnswers(params: GetUserStatsParams) {
     const totalAnswers = await Answer.countDocuments({ author: userId });
 
     const userAnswers = await Answer.find({ author: userId })
-      .sort({ createdAt: -1, views: -1, upvotes: -1 })
+      .sort({ upvotes: -1 })
       .skip(skipAmount)
       .limit(pageSize)
       .populate("question", "_id title")
       .populate("author", "_id clerkId name picture");
 
-    const isNextAnswers = totalAnswers > skipAmount + userAnswers.length;
+    const isNextAnswer = totalAnswers > skipAmount + userAnswers.length;
 
-    return { totalAnswers, answers: userAnswers, isNextAnswers };
+    return { totalAnswers, answers: userAnswers, isNextAnswer };
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
+
+// export async function getAllUsers(params: GetAllUsersParams) {
+//   try {
+//     connectToDatabase();
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// }
