@@ -10,6 +10,7 @@ import { toggleSaveQuestion } from "@/lib/actions/user.action";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "../ui/use-toast";
 
 interface Props {
   type: string;
@@ -41,11 +42,21 @@ const Votes = ({
       userId: JSON.parse(userId),
       path: pathname,
     });
+
+    return toast({
+      title: `Question ${
+        !hasSaved ? "Saved in" : "Removed from"
+      } your collection`,
+      variant: !hasSaved ? "default" : "destructive",
+    });
   };
 
   const handleVote = async (action: string) => {
     if (!userId) {
-      return;
+      return toast({
+        title: "Please log in",
+        description: "You need to be logged in to vote",
+      });
     }
 
     if (action === "upvote") {
@@ -67,8 +78,10 @@ const Votes = ({
         });
       }
 
-      // todo: show a toast
-      return;
+      return toast({
+        title: `Upvote ${!hasupVoted ? "Succesful" : "Removed"}`,
+        variant: !hasupVoted ? "default" : "destructive",
+      });
     }
 
     if (action == "downvote") {
@@ -90,8 +103,10 @@ const Votes = ({
         });
       }
 
-      // todo: show a toast
-      return;
+      return toast({
+        title: `Downvote ${!hasdownVoted ? "Succesful" : "Removed"}`,
+        variant: !hasdownVoted ? "default" : "destructive",
+      });
     }
   };
 

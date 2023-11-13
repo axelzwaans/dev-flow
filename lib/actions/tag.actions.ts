@@ -51,7 +51,7 @@ export async function getAllTags(params: GetAllTagsParams) {
 
     switch (filter) {
       case "popular":
-        sortOptions = { questions: -1 };
+        sortOptions = { questions: 1 };
         break;
       case "recent":
         sortOptions = { createdAt: -1 };
@@ -101,7 +101,7 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
       options: {
         sort: { createdAt: -1 },
         skip: skipAmount,
-        limit: pageSize + 1, // +1 to check if there is next page
+        limit: pageSize + 1,
       },
       populate: [
         { path: "tags", model: Tag, select: "_id name" },

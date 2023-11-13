@@ -75,8 +75,10 @@ const Page = async ({ params, searchParams }: URLProps) => {
       </div>
 
       <Stats
+        reputation={userInfo.reputation}
         totalQuestions={userInfo.totalQuestions}
         totalAnswers={userInfo.totalAnswers}
+        badges={userInfo.badgeCounts}
       />
 
       <div className="mt-10 flex gap-10">
@@ -89,7 +91,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
               Answers
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="top-posts">
+          <TabsContent value="top-posts" className="mt-5 flex w-full">
             <QuestionTab
               searchParams={searchParams}
               userId={userInfo.user._id}
