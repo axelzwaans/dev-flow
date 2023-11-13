@@ -13,7 +13,7 @@ interface AnswerProps {
     picture: string;
     clerkId: string;
   };
-  upvotes: string[];
+  upvotes: number;
   createdAt: Date;
   question: {
     _id: string;
