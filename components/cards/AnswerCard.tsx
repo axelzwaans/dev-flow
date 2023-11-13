@@ -11,7 +11,7 @@ interface AnswerProps {
     _id: string;
     name: string;
     picture: string;
-    clerkId: string;
+    clerkId: string | null;
   };
   upvotes: number;
   createdAt: Date;

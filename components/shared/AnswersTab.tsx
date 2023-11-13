@@ -5,7 +5,7 @@ import Pagination from "./Pagination";
 
 interface Props extends SearchParamsProps {
   userId: string;
-  clerkId?: string | null;
+  clerkId?: string;
 }
 
 const AnswersTab = async ({ searchParams, userId, clerkId }: Props) => {
@@ -21,7 +21,6 @@ const AnswersTab = async ({ searchParams, userId, clerkId }: Props) => {
           key={answer.id}
           _id={answer.id}
           clerkId={clerkId}
-          title={answer.content}
           question={answer.question}
           author={answer.author}
           upvotes={answer.upvotes.length}
